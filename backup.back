@@ -1,0 +1,11 @@
+for index, valueReq in ipairs(whitelistRoles) do
+    if has_value(usersRoles, valueReq) then
+        passAuth = true
+    end
+    if next(whitelistRoles,index) == nil then
+        if passAuth == true then
+            deferrals.done()
+        else
+            deferrals.done(notWhitelistedMessage)
+        end
+    end

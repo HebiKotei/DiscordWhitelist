@@ -7,11 +7,15 @@
 notWhitelistedMessage = "You are not whitelisted for this server." -- Message displayed when they are not whitelist with the role
 
 whitelistRoles = { -- Role nickname(s) needed to pass the whitelist
-    "DISCORD_ROLE_ID",
-    "DISCORD_ROLE_ID",
-    "DISCORD_ROLE_ID",
+  "DISCORD_ROLE_ID",
 }
 
+
+blacklistRole = {
+  "DISCORD_ROLE_ID",
+}
+
+bannedMessage = "You are currently banned from the server"
 --- Code ---
 
 AddEventHandler("playerConnecting", function(name, setCallback, deferrals)
@@ -38,19 +42,30 @@ AddEventHandler("playerConnecting", function(name, setCallback, deferrals)
             end
             return false
         end
-        for index, valueReq in ipairs(whitelistRoles) do 
-            if has_value(usersRoles, valueReq) then
+        for index, valueReq in ipairs (blacklistRole) do
+          if has_value(usersRoles, valueReq) then
+            passAuth = false
+          else
+            for index, valueReq in ipairs (whitelistRoles) do
+              if has_value(usersRoles, valueReq) then
                 passAuth = true
-            end
-            if next(whitelistRoles,index) == nil then
+              end
+              if next(whitelistRoles, index) == nil then
                 if passAuth == true then
-                    deferrals.done()
+                  deferrals.done()
                 else
-                    deferrals.done(notWhitelistedMessage)
+                  deferrals.done(notWhitelistedMessage)
                 end
+              end
             end
+            if next(blacklistRole, index) == nil then
+              if passAuth == false then
+                deferrals.done(bannedMessage)
+              end
+            end
+          end
         end
-    else
-        deferrals.done("Discord was not detected. Please make sure Discord is running and installed. See the below link for a debugging process - docs.faxes.zone/docs/debugging-discord")
+      end
     end
-end)
+  end
+end
